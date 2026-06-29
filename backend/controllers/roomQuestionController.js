@@ -16,16 +16,18 @@ const addRoomQuestion = async (req, res) => {
         }
 
         // CHECK ACTIVE QUESTION (only one allowed at a time)
-        const activeQuestion = await RoomQuestion.findOne({
-            roomId: room._id,
-            status: "pending"
-        });
+     const activeQuestion = await RoomQuestion.findOne({
+    roomId: room._id,
+    status: "pending"
+});
 
-        if (activeQuestion) {
-            return res.status(400).json({
-                message: "Solve current question first before adding new one"
-            });
-        }
+if (activeQuestion && activeQuestion.status !== "solved") {
+    return res.status(400).json({
+        message: "❌ Cannot add new question. Current question is not solved yet."
+    });
+}
+
+// if question exists AND not fully solved → block
 
         // NORMALIZE QUESTION
         const normalizedQuestion = question.trim().toLowerCase();
@@ -78,7 +80,24 @@ const getCurrentQuestion = async (req, res) => {
             status: "pending"
         });
 
-        res.json(question);
+        if (!question) {
+            return res.json(question);
+        }
+
+        // ATTACH VOTE SUMMARY (no names — just counts, for the "waiting on members" UI)
+        const memberIds = room.members.map(m => m.toString());
+        const yesCount = question.votes.filter(
+            v => memberIds.includes(v.userId.toString()) && v.vote === "yes"
+        ).length;
+
+        res.json({
+            ...question.toObject(),
+            votesSummary: {
+                yesCount,
+                totalMembers: memberIds.length,
+                allSolved: yesCount === memberIds.length
+            }
+        });
 
     } catch (error) {
         res.status(500).json({
@@ -89,6 +108,9 @@ const getCurrentQuestion = async (req, res) => {
 
 
 // ➤ MARK QUESTION AS SOLVED
+// ⚠️ WARNING: this bypasses the "all members must vote yes" rule.
+// Do not wire this to any button/route unless that's intentional —
+// voteQuestion is the only path that should resolve a question.
 const markSolved = async (req, res) => {
     try {
         const { id } = req.params;
@@ -131,7 +153,9 @@ const voteQuestion = async (req, res) => {
             return res.status(404).json({ message: "Question not found" });
         }
 
-        // ✅ FIXED PART (replace old filter+push)
+        // Each user gets exactly one vote entry: update it if they already
+        // voted (e.g. changing "no" -> "yes"), otherwise add a new one.
+        // This never touches any other user's vote.
         const existingVote = question.votes.find(
             v => v.userId.toString() === req.user.id
         );
@@ -147,18 +171,42 @@ const voteQuestion = async (req, res) => {
 
         await question.save();
 
-        const room = await Room.findOne({ _id: question.roomId });
+    // get unique YES voters
 
-        const yesVotes = question.votes.filter(
-            v => v.vote === "yes"
-        ).length;
 
-        if (yesVotes === room.members.length) {
-            question.status = "solved";
-            await question.save();
-        }
+// room members
+const room = await Room.findById(question.roomId);
+const memberIds = room.members.map(m => m.toString());
+const voteMap = {};
 
-        res.json(question);
+question.votes.forEach(v => {
+    voteMap[v.userId.toString()] = v.vote;
+});
+
+// check ALL members voted YES
+const allVotedYes = memberIds.every(memberId =>
+    voteMap[memberId] === "yes"
+);
+
+if (allVotedYes) {
+    const updatedQuestion = await RoomQuestion.findByIdAndUpdate(
+        question._id,
+        { status: "solved" },
+        { new: true }
+    );
+
+    return res.json({
+        message: "🎉 All members marked this solved! The next question can now be shared.",
+        question: updatedQuestion,
+        solved: true
+    });
+}
+
+return res.json({
+    message: "Vote saved. All members must solve this question before the next one can be shared.",
+    question,
+    solved: false
+});
 
     } catch (error) {
         res.status(500).json({ message: error.message });
