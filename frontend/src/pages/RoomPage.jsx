@@ -298,7 +298,7 @@ progressFill: {
     } catch (err) {
         console.log(err);
     }
-},[roomCode,token,selectedQuestion]);
+},[roomCode, token, fetchApproaches]);
 
 // GET ALL QUESTIONS
 const fetchQuestion = useCallback(async () => {
@@ -322,7 +322,7 @@ const fetchQuestion = useCallback(async () => {
     } catch (err) {
         console.log(err);
     }
-},[roomCode, token]);
+},[roomCode, token, fetchApproaches, selectedQuestion]);
 const fetchHistory = useCallback(async () => {
     try {
 
@@ -366,7 +366,7 @@ const sendMessage = () => {
     setMessages("");
 };
     // GET APPROACHES
-    const fetchApproaches = async (questionId) => {
+    const fetchApproaches = useCallback(async (questionId) => {
         try {
             const res = await axios.get(
                 `https://codemate-backend-rhj8.onrender.com/api/approach/${questionId}`,
@@ -380,7 +380,7 @@ const sendMessage = () => {
         } catch (err) {
             console.log(err);
         }
-    };
+    },[token]);
 
     // SELECT QUESTION
     const handleSelectQuestion = (q) => {
