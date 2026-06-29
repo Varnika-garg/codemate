@@ -24,11 +24,11 @@ const roomQuestionSchema = new mongoose.Schema(
                 ref: "User"
             },
 
-            vote: {
-                type: String,
-                enum: ["yes", "no"],
-                default: "no"
-            }
+           vote: {
+    type: String,
+    enum: ["yes", "no"],
+    required: true
+}
         }
     ],
 
