@@ -45,7 +45,7 @@ function Home() {
 
       return () => clearTimeout(t);
     }
-  }, [charIndex, index]);
+}, [charIndex, index, texts]);
 
   return (
     <div

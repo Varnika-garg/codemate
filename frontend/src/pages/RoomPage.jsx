@@ -9,7 +9,6 @@ function RoomPage() {
     const { roomCode } = useParams();
     const token = localStorage.getItem("token");
     const [roomInfo, setRoomInfo] = useState(null);
-    const [question, setQuestion] = useState(null);
     const [approaches, setApproaches] = useState([]);
     const [thinking, setThinking] = useState("");
     const [code, setCode] = useState("");
@@ -291,8 +290,6 @@ progressFill: {
                 }
             }
         );
-
-        setQuestion(res.data);
         if (res.data) {
     setSelectedQuestion(res.data);
     fetchApproaches(res.data._id);
@@ -529,7 +526,7 @@ useEffect(() => {
     fetchQuestion();
     fetchQuestions();
     fetchHistory();
-}, []);
+}, [token, roomCode]);
 useEffect(() => {
     const fetchUser = async () => {
         try {
@@ -548,7 +545,7 @@ useEffect(() => {
     };
 
     fetchUser();
-}, []);
+}, [token]);
 
 // Keep the question grid page in sync whenever the selected question
 // changes from elsewhere (initial load, voting, adding a question).

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 
 function Practice() {
@@ -26,29 +27,28 @@ function Practice() {
     }, []);
 
     // FETCH PRACTICE DATA
-    const fetchPractice = async () => {
-        try {
-            const res = await axios.get(
-                "https://codemate-backend-rhj8.onrender.com/api/practice/all",
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+    const fetchPractice = useCallback(async () => {
+    try {
+        const res = await axios.get(
+            "https://codemate-backend-rhj8.onrender.com/api/practice/all",
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
                 }
-            );
+            }
+        );
 
-            setData(res.data);
-            // auto-expand first topic once loaded
-            const keys = Object.keys(res.data || {});
-            if (keys.length > 0) setOpenTopic((prev) => prev ?? keys[0]);
-        } catch (err) {
-            console.log(err);
-        }
-    };
+        setData(res.data);
+        const keys = Object.keys(res.data || {});
+        if (keys.length > 0) setOpenTopic((prev) => prev ?? keys[0]);
+    } catch (err) {
+        console.log(err);
+    }
+}, [token]);
 
-    useEffect(() => {
-        fetchPractice();
-    }, []);
+useEffect(() => {
+    fetchPractice();
+}, [fetchPractice]);
 
     // HANDLE INPUT
     const handleChange = (e) => {
