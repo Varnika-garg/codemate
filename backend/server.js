@@ -17,13 +17,17 @@ const chatRoutes = require("./routes/chatRoutes");
 const app = express();
 
 // middleware
-const allowedOrigin = process.env.CLIENT_URL || "http://localhost:3000";
+const allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    process.env.CLIENT_URL
+];
 
-// middleware
 app.use(cors({
-    origin: allowedOrigin,
+    origin: allowedOrigins,
     credentials: true
 }));
+
 
 app.use(express.json());
 
@@ -36,7 +40,7 @@ const server = http.createServer(app);
 // SOCKET SETUP
 const io = new Server(server, {
     cors: {
-        origin: allowedOrigin,
+        origin: allowedOrigins,
         methods: ["GET", "POST"],
         credentials: true
     }
