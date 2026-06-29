@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState ,useCallback} from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import confetti from "canvas-confetti";
@@ -262,7 +262,7 @@ progressFill: {
     transition: "width 0.3s ease",
 },
 };
-    const fetchRoomInfo = async () => {
+   const fetchRoomInfo = useCallback(async () => {
     try {
         const res = await axios.get(
             `https://codemate-backend-rhj8.onrender.com/api/rooms/${roomCode}`,
@@ -278,9 +278,9 @@ progressFill: {
     } catch (err) {
         console.log(err);
     }
-};
+},[roomCode,token]);
     // GET CURRENT QUESTION
-    const fetchQuestion = async () => {
+    const fetchQuestions = useCallback(async () => {
     try {
         const res = await axios.get(
             `https://codemate-backend-rhj8.onrender.com/api/room-question/current/${roomCode}`,
@@ -298,10 +298,10 @@ progressFill: {
     } catch (err) {
         console.log(err);
     }
-};
+},[roomCode,token,selectedQuestion]);
 
 // GET ALL QUESTIONS
-const fetchQuestions = async () => {
+const fetchQuestion = useCallback(async () => {
     try {
         const res = await axios.get(
             `https://codemate-backend-rhj8.onrender.com/api/room-question/all/${roomCode}`,
@@ -322,8 +322,8 @@ const fetchQuestions = async () => {
     } catch (err) {
         console.log(err);
     }
-};
-const fetchHistory = async () => {
+},[roomCode, token]);
+const fetchHistory = useCallback(async () => {
     try {
 
         const res = await axios.get(
@@ -340,7 +340,7 @@ const fetchHistory = async () => {
     } catch (err) {
         console.log(err);
     }
-};
+},[roomCode, token]);
 const leaveRoom = async () => {
     try {
         await axios.post(
@@ -526,7 +526,10 @@ useEffect(() => {
     fetchQuestion();
     fetchQuestions();
     fetchHistory();
-}, [token, roomCode]);
+}, [fetchRoomInfo,
+    fetchQuestion,
+    fetchQuestions,
+    fetchHistory]);
 useEffect(() => {
     const fetchUser = async () => {
         try {

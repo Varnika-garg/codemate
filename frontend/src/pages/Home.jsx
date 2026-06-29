@@ -4,10 +4,10 @@ import { useNavigate } from "react-router-dom";
 function Home() {
   const navigate = useNavigate();
 
-  const texts = [
-    "DSA Practice Platform • Collaborative Coding Space",
-    "Interview Preparation Hub • Real-world Problem Solving",
-  ];
+  const texts = useMemo(() => [
+  "DSA Practice Platform • Collaborative Coding Space",
+  "Interview Preparation Hub • Real-world Problem Solving",
+], []);
 
   const [text, setText] = useState("");
   const [index, setIndex] = useState(0);
