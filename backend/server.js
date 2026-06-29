@@ -17,7 +17,14 @@ const chatRoutes = require("./routes/chatRoutes");
 const app = express();
 
 // middleware
-app.use(cors());
+const allowedOrigin = process.env.CLIENT_URL || "http://localhost:3000";
+
+// middleware
+app.use(cors({
+    origin: allowedOrigin,
+    credentials: true
+}));
+
 app.use(express.json());
 
 // DB connect
@@ -29,8 +36,9 @@ const server = http.createServer(app);
 // SOCKET SETUP
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000",
-        methods: ["GET", "POST"]
+        origin: allowedOrigin,
+        methods: ["GET", "POST"],
+        credentials: true
     }
 });
 
@@ -70,6 +78,9 @@ app.get("/", (req, res) => {
 });
 
 // IMPORTANT: use server.listen not app.listen
-server.listen(5000, () => {
-    console.log("Server running on port 5000");
+const PORT = process.env.PORT || 5000;
+
+// IMPORTANT: use server.listen not app.listen
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
