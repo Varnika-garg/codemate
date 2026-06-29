@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import confetti from "canvas-confetti";
 import { io } from "socket.io-client";
-const socket = io("http://localhost:5000");
+const socket = io("https://codemate-backend-rhj8.onrender.com");
 function RoomPage() {
     const [activeTab, setActiveTab] = useState("current");
     const { roomCode } = useParams();
@@ -266,7 +266,7 @@ progressFill: {
     const fetchRoomInfo = async () => {
     try {
         const res = await axios.get(
-            `http://localhost:5000/api/rooms/${roomCode}`,
+            `https://codemate-backend-rhj8.onrender.com/api/rooms/${roomCode}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -284,7 +284,7 @@ progressFill: {
     const fetchQuestion = async () => {
     try {
         const res = await axios.get(
-            `http://localhost:5000/api/room-question/current/${roomCode}`,
+            `https://codemate-backend-rhj8.onrender.com/api/room-question/current/${roomCode}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -307,7 +307,7 @@ progressFill: {
 const fetchQuestions = async () => {
     try {
         const res = await axios.get(
-            `http://localhost:5000/api/room-question/all/${roomCode}`,
+            `https://codemate-backend-rhj8.onrender.com/api/room-question/all/${roomCode}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -330,7 +330,7 @@ const fetchHistory = async () => {
     try {
 
         const res = await axios.get(
-            `http://localhost:5000/api/room-question/history/${roomCode}`,
+            `https://codemate-backend-rhj8.onrender.com/api/room-question/history/${roomCode}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -347,7 +347,7 @@ const fetchHistory = async () => {
 const leaveRoom = async () => {
     try {
         await axios.post(
-            "http://localhost:5000/api/rooms/leave",
+            "https://codemate-backend-rhj8.onrender.com/api/rooms/leave",
             { roomCode },
             { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -372,7 +372,7 @@ const sendMessage = () => {
     const fetchApproaches = async (questionId) => {
         try {
             const res = await axios.get(
-                `http://localhost:5000/api/approach/${questionId}`,
+                `https://codemate-backend-rhj8.onrender.com/api/approach/${questionId}`,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
@@ -405,7 +405,7 @@ const sendMessage = () => {
 const voteQuestion = async (vote) => {
     try {
         const res = await axios.post(
-            `http://localhost:5000/api/room-question/vote/${selectedQuestion._id}`,
+            `https://codemate-backend-rhj8.onrender.com/api/room-question/vote/${selectedQuestion._id}`,
             { vote },
             {
                 headers: {
@@ -442,7 +442,7 @@ const voteQuestion = async (vote) => {
     const addQuestion = async () => {
     try {
         await axios.post(
-            "http://localhost:5000/api/room-question/add",
+            "https://codemate-backend-rhj8.onrender.com/api/room-question/add",
             {
                 roomCode,
                 question: newQuestion,
@@ -488,7 +488,7 @@ const submitApproach = async () => {
 
     try {
         await axios.post(
-            "http://localhost:5000/api/approach/add",
+            "https://codemate-backend-rhj8.onrender.com/api/approach/add",
             {
                 roomCode,
                 questionId: selectedQuestion._id,
@@ -534,7 +534,7 @@ useEffect(() => {
     const fetchUser = async () => {
         try {
             const res = await axios.get(
-                "http://localhost:5000/api/users/me",
+                "https://codemate-backend-rhj8.onrender.com/api/users/me",
                 {
                     headers: {
                         Authorization: `Bearer ${token}`

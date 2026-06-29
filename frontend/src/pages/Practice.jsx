@@ -29,7 +29,7 @@ function Practice() {
     const fetchPractice = async () => {
         try {
             const res = await axios.get(
-                "http://localhost:5000/api/practice/all",
+                "https://codemate-backend-rhj8.onrender.com/api/practice/all",
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -62,7 +62,7 @@ function Practice() {
 
         try {
             await axios.post(
-                "http://localhost:5000/api/practice/add",
+                "https://codemate-backend-rhj8.onrender.com/api/practice/add",
                 form,
                 {
                     headers: {

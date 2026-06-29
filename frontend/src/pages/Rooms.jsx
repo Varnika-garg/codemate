@@ -22,7 +22,7 @@ function Rooms() {
         try {
             setLoading(true);
             const res = await axios.post(
-                "http://localhost:5000/api/rooms/create",
+                "https://codemate-backend-rhj8.onrender.com/api/rooms/create",
                 { roomName },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -39,7 +39,7 @@ function Rooms() {
         try {
             setLoading(true);
             const res = await axios.post(
-                "http://localhost:5000/api/rooms/join",
+                "https://codemate-backend-rhj8.onrender.com/api/rooms/join",
                 { roomCode },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
