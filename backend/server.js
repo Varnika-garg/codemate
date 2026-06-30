@@ -20,14 +20,21 @@ const app = express();
 const allowedOrigins = [
     "http://localhost:3000",
     "http://localhost:3001",
-    process.env.CLIENT_URL
-];
+    "https://mycodemate-app.vercel.app",
+    "https://codemate-gules.vercel.app"
+].filter(Boolean);
 
 app.use(cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        } else {
+            return callback(new Error("Not allowed by CORS"));
+        }
+    },
     credentials: true
 }));
-
 
 app.use(express.json());
 
@@ -42,7 +49,8 @@ const io = new Server(server, {
     cors: {
         origin: allowedOrigins,
         methods: ["GET", "POST"],
-        credentials: true
+        credentials: true,
+        transports: ["websocket", "polling"]
     }
 });
 
