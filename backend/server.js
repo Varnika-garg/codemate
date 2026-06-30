@@ -14,50 +14,44 @@ const roomRoutes = require("./routes/roomRoutes");
 const roomQuestionRoutes = require("./routes/roomQuestionRoutes");
 const approachRoutes = require("./routes/approachRoutes");
 const chatRoutes = require("./routes/chatRoutes");
+
 const app = express();
 
-// middleware
-const allowedOrigins = [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "https://mycodemate-app.vercel.app",
-    "https://codemate-gules.vercel.app"
-].filter(Boolean);
-
-app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.includes(origin)) {
-            return callback(null, true);
-        } else {
-            return callback(new Error("Not allowed by CORS"));
-        }
-    },
-    credentials: true
-}));
+connectDB();
 
 app.use(express.json());
 
-// DB connect
-connectDB();
+// ✅ SIMPLE & SAFE CORS (IMPORTANT FIX)
+app.use(cors({
+    origin: [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "https://mycodemate-app.vercel.app",
+        "https://codemate-gules.vercel.app"
+    ],
+    credentials: true
+}));
 
-// HTTP server (IMPORTANT for socket)
 const server = http.createServer(app);
 
-// SOCKET SETUP
+// ✅ SOCKET FIX (IMPORTANT)
 const io = new Server(server, {
     cors: {
-        origin: allowedOrigins,
+        origin: [
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "https://mycodemate-app.vercel.app",
+            "https://codemate-gules.vercel.app"
+        ],
         methods: ["GET", "POST"],
         credentials: true,
-        transports: ["websocket", "polling"]
+        transports: ["polling", "websocket"]
     }
 });
 
-// make io accessible in controllers
 app.set("io", io);
 
-// SOCKET EVENTS
+// SOCKET
 io.on("connection", (socket) => {
     console.log("User connected:", socket.id);
 
@@ -65,34 +59,32 @@ io.on("connection", (socket) => {
         socket.join(roomCode);
     });
 
-  socket.on("send_message", (data) => {
-    io.to(data.roomCode).emit("receive_message", {
-        message: data.message,
-        user: data.user
+    socket.on("send_message", (data) => {
+        io.to(data.roomCode).emit("receive_message", {
+            message: data.message,
+            user: data.user
+        });
     });
-});
 
     socket.on("disconnect", () => {
         console.log("User disconnected:", socket.id);
     });
 });
 
-// routes
+// ROUTES
 app.use("/api/users", userRoutes);
 app.use("/api/practice", practiceRoutes);
 app.use("/api/rooms", roomRoutes);
 app.use("/api/room-question", roomQuestionRoutes);
 app.use("/api/approach", approachRoutes);
 app.use("/api/chat", chatRoutes);
-// test route
+
 app.get("/", (req, res) => {
     res.send("Codemate API Running 🚀");
 });
 
-// IMPORTANT: use server.listen not app.listen
 const PORT = process.env.PORT || 5000;
 
-// IMPORTANT: use server.listen not app.listen
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
