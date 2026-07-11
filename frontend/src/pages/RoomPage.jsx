@@ -2,10 +2,6 @@ import React, { useEffect, useState ,useCallback} from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import confetti from "canvas-confetti";
-import React, { useEffect, useState ,useCallback} from "react";
-import { useParams } from "react-router-dom";
-import axios from "axios";
-import confetti from "canvas-confetti";
 import { io } from "socket.io-client";
 function RoomPage() {
     const [activeTab, setActiveTab] = useState("current");
